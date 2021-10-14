@@ -24,10 +24,7 @@ public class RedisExecProvider {
     }
 
     private void initExecutables() {
-        executables.put(OsArchitecture.UNIX_x86, "redis-server-6.0.5-32");
         executables.put(OsArchitecture.UNIX_x86_64, "redis-server-6.0.5");
-
-        executables.put(OsArchitecture.MAC_OS_X_x86, "redis-server-6.0.5.app");
         executables.put(OsArchitecture.MAC_OS_X_x86_64, "redis-server-6.0.5.app");
     }
 
@@ -46,14 +43,12 @@ public class RedisExecProvider {
     }
     
     public File get() throws IOException {
-        OsArchitecture osArch = OsArchitecture.detect();
-
-        if (!executables.containsKey(osArch)) {
-            throw new IllegalArgumentException("No Redis executable found for " + osArch);
+        String executablePath = "";
+        if (System.getProperty("os.name").contains("Mac")) {
+            executablePath = executables.get(OsArchitecture.MAC_OS_X_x86_64);
+        } else {
+            executablePath = executables.get(OsArchitecture.UNIX_x86_64);
         }
-
-        String executablePath = executables.get(osArch);
-
         return fileExists(executablePath) ?
                 new File(executablePath) :
                 JarUtil.extractExecutableFromJar(executablePath);
